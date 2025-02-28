@@ -54,6 +54,5 @@ jobs:
               sudo docker stop my-mbook-container
               sudo docker rm my-mbook-container
             fi
-            sudo docker rm my-book-container
             sudo docker run -d -p 8080:8080 --name my-mbook-container phogatrohit21/mbook:latest
             
