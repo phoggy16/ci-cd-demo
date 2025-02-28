@@ -50,9 +50,7 @@ jobs:
           script: |
             sudo docker login
             sudo docker pull phogatrohit21/mbook:latest
-            if [ "$(docker ps -q -f name=my-mbook-container)" ]; then
-              sudo docker stop my-mbook-container
-              sudo docker rm my-mbook-container
-            fi
+            sudo docker stop my-mbook-container
+            sudo docker rm my-mbook-container
             sudo docker run -d -p 8080:8080 --name my-mbook-container phogatrohit21/mbook:latest
             
