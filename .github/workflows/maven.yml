@@ -40,6 +40,7 @@ jobs:
           docker push phogatrohit21/mbook:latest
   deploy:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
@@ -50,7 +51,7 @@ jobs:
           script: |
             sudo docker login
             sudo docker pull phogatrohit21/mbook:latest
-            sudo docker stop my-mbook-container
-            sudo docker rm my-mbook-container
+            sudo docker stop my-mbook-container 2>/dev/null || true
+            sudo docker rm my-mbook-container 2>/dev/null || true
             sudo docker run -d -p 8080:8080 --name my-mbook-container phogatrohit21/mbook:latest
             
