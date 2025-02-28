@@ -3,11 +3,16 @@ package com.example.demo;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/health-check")
+@RequestMapping("/api")
 public class HealthController {
 
-    @GetMapping
+    @GetMapping("health")
     public String health(){
         return "OK";
+    }
+
+    @GetMapping("test-ci-cd")
+    public String testCiCi(){
+        return "CI CD Working fine";
     }
 }
