@@ -11,7 +11,7 @@ public class HealthController {
         return "OK";
     }
 
-    @GetMapping("test-ci-cd")
+    @GetMapping("test")
     public String testCiCi(){
         return "CI CD Working fine";
     }
