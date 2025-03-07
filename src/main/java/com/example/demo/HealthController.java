@@ -15,4 +15,9 @@ public class HealthController {
     public String testCiCi(){
         return "CI CD Working fine";
     }
+
+    @GetMapping("pr-test")
+    public String testPr(){
+        return "pr-test";
+    }
 }
