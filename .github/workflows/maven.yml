@@ -6,6 +6,8 @@ name: MB-BE-develop Java CI with Maven
 on:
   push:
     branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 permissions:
   id-token: write
@@ -41,6 +43,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    if: github.event_name == 'push'
     steps:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
