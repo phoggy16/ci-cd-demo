@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.time.LocalDateTime;
 
-@ControllerAdvice(basePackages = {"com.example.demo.handler"})
+@ControllerAdvice(basePackages = {"com.example.demo"})
 public class GarageExceptionHandler extends ResponseEntityExceptionHandler {
 
 
