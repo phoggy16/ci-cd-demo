@@ -7,6 +7,10 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import com.amazonaws.xray.entities.Segment;
+import com.amazonaws.xray.entities.Subsegment;
+import com.amazonaws.xray.AWSXRay;
+
 
 
 import java.io.IOException;
@@ -36,12 +40,26 @@ public class HealthController {
                 .readTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
-        Request request = new Request.Builder()
-                .url("https://jsonplaceholder.typicode.com/todos/1")
-                .get()
-                .build();
 
-        Response httpResponse = client.newCall(request).execute();
-        return httpResponse.body().string();
+        Segment segment = AWSXRay.beginSegment("MyApplication");
+
+        Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: https://jsonplaceholder.typicode.com/todos/1");
+
+        try {
+            Request request = new Request.Builder()
+                    .url("https://jsonplaceholder.typicode.com/todos/1")
+                    .build();
+
+            Response response = client.newCall(request).execute();
+
+            subsegment.putMetadata("status_code", response.code());
+            return response.body().string();
+        } catch (Exception e) {
+            subsegment.addException(e);
+            throw e;
+        } finally {
+            AWSXRay.endSubsegment();
+            AWSXRay.endSegment();
+        }
     }
 }
