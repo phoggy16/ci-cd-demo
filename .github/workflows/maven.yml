@@ -56,6 +56,4 @@ jobs:
             sudo docker pull phogatrohit21/mbook:latest
             sudo docker stop my-mbook-container 2>/dev/null || true
             sudo docker rm my-mbook-container 2>/dev/null || true
-            sudo docker run -d -p 8080:8080 --name my-mbook-container --log-driver=awslogs --log-opt awslogs-group=demo-logs --log-opt awslogs-stream=demo-log-stream  phogatrohit21/mbook:latest
-            
-  
+            sudo docker run -d -p 8080:8080 --name my-mbook-container --log-driver=awslogs --log-opt awslogs-group=demo-logs --log-opt awslogs-stream=demo-log-stream -e AWS_XRAY_DAEMON_ADDRESS=xray-daemon:2000 phogatrohit21/mbook:latest
