@@ -1,5 +1,8 @@
 package com.example.demo;
 
+import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.entities.Segment;
+import com.amazonaws.xray.entities.Subsegment;
 import com.example.demo.exception.GarageException;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -7,10 +10,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.amazonaws.xray.entities.Segment;
-import com.amazonaws.xray.entities.Subsegment;
-import com.amazonaws.xray.AWSXRay;
-
 
 
 import java.io.IOException;
@@ -44,7 +43,6 @@ public class HealthController {
         Segment segment = AWSXRay.beginSegment("MyApplication");
 
         Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: https://jsonplaceholder.typicode.com/todos/1");
-
         try {
             Request request = new Request.Builder()
                     .url("https://jsonplaceholder.typicode.com/todos/1")
