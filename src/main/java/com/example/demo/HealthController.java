@@ -2,12 +2,10 @@ package com.example.demo;
 
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.entities.Segment;
-import com.amazonaws.xray.entities.Subsegment;
 import com.example.demo.exception.GarageException;
 import jakarta.servlet.http.HttpServletRequest;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,7 +39,7 @@ public class HealthController {
     @GetMapping("pr-test")
     public String testPr(@RequestParam String url) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new XRayOkHttpInterceptor())
+//                .addInterceptor(new XRayOkHttpInterceptor())
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
@@ -73,6 +71,9 @@ public class HealthController {
             return response.body().string();
         } catch (Exception e) {
             segment.setError(true);
+            httpMap.put("response", Map.of(
+                    "status", 500
+            ));
             segment.putMetadata("error", e.getMessage());
             throw e;
         } finally {
