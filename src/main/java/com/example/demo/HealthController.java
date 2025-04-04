@@ -4,10 +4,12 @@ import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.entities.Segment;
 import com.amazonaws.xray.entities.Subsegment;
 import com.example.demo.exception.GarageException;
+import jakarta.servlet.http.HttpServletRequest;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,9 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/api")
 public class HealthController {
+
+    @Autowired
+    HttpServletRequest httpServletRequest;
 
     @GetMapping("health")
     public String health(){
@@ -42,31 +47,28 @@ public class HealthController {
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
 
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
+        Segment segment = AWSXRay.beginSegment("MyApplication");
+        segment.setOrigin(httpServletRequest.getRequestURI());
+        segment.setUser("Rohit");
 
-        Response response = client.newCall(request).execute();
-        return response.body().string();
+        try {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get()
+                    .build();
 
+            Map<String,Object> map=new HashMap<>();
+            map.put("request",request);
+            segment.setHttp(map);
+            Response response = client.newCall(request).execute();
 
-
-//        Segment segment = AWSXRay.beginSegment("MyApplication");
-//        try {
-//            Request request = new Request.Builder()
-//                    .url(url)
-//                    .get()
-//                    .build();
-//
-//            Response response = client.newCall(request).execute();
-//            return response.body().string();
-//        } catch (Exception e) {
-//            segment.setError(true);
-//            segment.putMetadata("error", e);
-//            throw e;
-//        } finally {
-//            AWSXRay.endSegment();
-//        }
+            return response.body().string();
+        } catch (Exception e) {
+            segment.setError(true);
+            segment.putMetadata("error", e.getMessage());
+            throw e;
+        } finally {
+            AWSXRay.endSegment();
+        }
     }
 }
