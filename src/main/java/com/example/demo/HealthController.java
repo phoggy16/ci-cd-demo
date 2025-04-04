@@ -57,9 +57,16 @@ public class HealthController {
                     .get()
                     .build();
 
-            Map<String,Object> map=new HashMap<>();
-            map.put("request",request);
-            segment.setHttp(map);
+            Map<String, Object> httpMap = new HashMap<>();
+            httpMap.put("request", Map.of(
+                    "method", "GET",
+                    "url", url
+            ));
+//            httpMap.put("response", Map.of(
+//                    "status", response.code()
+//            ));
+//            segment.putHttp("");
+            segment.setHttp(httpMap);
             Response response = client.newCall(request).execute();
 
             return response.body().string();
