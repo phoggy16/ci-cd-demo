@@ -32,7 +32,7 @@ public class HealthController {
     }
 
     @GetMapping("pr-test")
-    public String testPr() throws IOException {
+    public String testPr(@RequestParam String url) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new XRayOkHttpInterceptor())
                 .connectTimeout(60, TimeUnit.SECONDS)
@@ -41,22 +41,17 @@ public class HealthController {
                 .build();
 
         Segment segment = AWSXRay.beginSegment("MyApplication");
-
-        Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: https://jsonplaceholder.typicode.com/todos/1");
         try {
             Request request = new Request.Builder()
-                    .url("https://jsonplaceholder.typicode.com/todos/1")
+                    .url(url)
+                    .get()
                     .build();
 
             Response response = client.newCall(request).execute();
-
-            subsegment.putMetadata("status_code", response.code());
             return response.body().string();
         } catch (Exception e) {
-            subsegment.addException(e);
             throw e;
         } finally {
-            AWSXRay.endSubsegment();
             AWSXRay.endSegment();
         }
     }

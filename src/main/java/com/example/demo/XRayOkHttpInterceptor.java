@@ -20,6 +20,8 @@ public class XRayOkHttpInterceptor implements Interceptor {
             subsegment.putAnnotation("method", request.method());
             subsegment.putAnnotation("url", request.url().toString());
             subsegment.putMetadata("response_code", response.code());
+            subsegment.putMetadata("request", request);
+            subsegment.putMetadata("response", response);
 
             return response;
         } catch (Exception e) {
