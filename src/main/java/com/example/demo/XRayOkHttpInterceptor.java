@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.entities.Segment;
 import com.amazonaws.xray.entities.Subsegment;
 import okhttp3.*;
 
@@ -10,12 +11,13 @@ public class XRayOkHttpInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
+
+        Segment segment = AWSXRay.beginSegment("MyApplication");
         Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: " + request.url());
 
         try {
             // Execute the request
             Response response = chain.proceed(request);
-
             // Add metadata to the trace
             subsegment.putAnnotation("method", request.method());
             subsegment.putAnnotation("url", request.url().toString());
@@ -25,10 +27,12 @@ public class XRayOkHttpInterceptor implements Interceptor {
 
             return response;
         } catch (Exception e) {
+            segment.setError(true);
             subsegment.addException(e);
             throw e;
         } finally {
             AWSXRay.endSubsegment();
+            AWSXRay.endSegment();
         }
     }
 }

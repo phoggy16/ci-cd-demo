@@ -42,21 +42,31 @@ public class HealthController {
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
 
-        Segment segment = AWSXRay.beginSegment("MyApplication");
-        try {
-            Request request = new Request.Builder()
-                    .url(url)
-                    .get()
-                    .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .build();
 
-            Response response = client.newCall(request).execute();
-            return response.body().string();
-        } catch (Exception e) {
-            segment.setError(true);
-            segment.putMetadata("error", e);
-            throw e;
-        } finally {
-            AWSXRay.endSegment();
-        }
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+
+
+
+//        Segment segment = AWSXRay.beginSegment("MyApplication");
+//        try {
+//            Request request = new Request.Builder()
+//                    .url(url)
+//                    .get()
+//                    .build();
+//
+//            Response response = client.newCall(request).execute();
+//            return response.body().string();
+//        } catch (Exception e) {
+//            segment.setError(true);
+//            segment.putMetadata("error", e);
+//            throw e;
+//        } finally {
+//            AWSXRay.endSegment();
+//        }
     }
 }
