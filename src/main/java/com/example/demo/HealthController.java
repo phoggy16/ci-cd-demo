@@ -50,6 +50,7 @@ public class HealthController {
         Segment segment = AWSXRay.beginSegment("MyApplication");
         segment.setOrigin(httpServletRequest.getRequestURI());
         segment.setUser("Rohit");
+        Map<String, Object> httpMap = new HashMap<>();
 
         try {
             Request request = new Request.Builder()
@@ -57,17 +58,17 @@ public class HealthController {
                     .get()
                     .build();
 
-            Map<String, Object> httpMap = new HashMap<>();
             httpMap.put("request", Map.of(
                     "method", "GET",
                     "url", url
             ));
-//            httpMap.put("response", Map.of(
-//                    "status", response.code()
-//            ));
-//            segment.putHttp("");
-            segment.setHttp(httpMap);
+
+
             Response response = client.newCall(request).execute();
+
+            httpMap.put("response", Map.of(
+                    "status", response.code()
+            ));
 
             return response.body().string();
         } catch (Exception e) {
@@ -75,6 +76,7 @@ public class HealthController {
             segment.putMetadata("error", e.getMessage());
             throw e;
         } finally {
+            segment.setHttp(httpMap);
             AWSXRay.endSegment();
         }
     }
