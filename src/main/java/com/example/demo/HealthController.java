@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -50,6 +52,8 @@ public class HealthController {
             Response response = client.newCall(request).execute();
             return response.body().string();
         } catch (Exception e) {
+            segment.setError(true);
+            segment.putMetadata("error", e);
             throw e;
         } finally {
             AWSXRay.endSegment();
