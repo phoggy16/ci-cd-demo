@@ -11,6 +11,8 @@ public class XRayOkHttpInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
+
+        Segment segment = AWSXRay.beginSegment("MyApplication");
         Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: " + request.url());
 
         try {

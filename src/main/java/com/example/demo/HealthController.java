@@ -34,10 +34,10 @@ public class HealthController {
     }
 
     @GetMapping("pr-test")
-    @XRayEnabled
+//    @XRayEnabled
     public String testPr(@RequestParam String url) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
-//                .addInterceptor(new XRayOkHttpInterceptor())
+                .addInterceptor(new XRayOkHttpInterceptor())
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
