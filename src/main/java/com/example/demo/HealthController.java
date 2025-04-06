@@ -1,7 +1,6 @@
 package com.example.demo;
 
-import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.entities.Segment;
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.example.demo.exception.GarageException;
 import jakarta.servlet.http.HttpServletRequest;
 import okhttp3.OkHttpClient;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -37,6 +34,7 @@ public class HealthController {
     }
 
     @GetMapping("pr-test")
+    @XRayEnabled
     public String testPr(@RequestParam String url) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
 //                .addInterceptor(new XRayOkHttpInterceptor())
@@ -45,40 +43,50 @@ public class HealthController {
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
 
-        Segment segment = AWSXRay.beginSegment("MyApplication");
-        segment.setOrigin(httpServletRequest.getRequestURI());
-        segment.setUser("Rohit");
-        Map<String, Object> httpMap = new HashMap<>();
 
-        try {
-            Request request = new Request.Builder()
-                    .url(url)
-                    .get()
-                    .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .build();
 
-            httpMap.put("request", Map.of(
-                    "method", "GET",
-                    "url", url
-            ));
+        Response response = client.newCall(request).execute();
 
+        return response.body().toString();
 
-            Response response = client.newCall(request).execute();
-
-            httpMap.put("response", Map.of(
-                    "status", response.code()
-            ));
-
-            return response.body().string();
-        } catch (Exception e) {
-            segment.setError(true);
-            httpMap.put("response", Map.of(
-                    "status", 500
-            ));
-            segment.putMetadata("error", e.getMessage());
-            throw e;
-        } finally {
-            segment.setHttp(httpMap);
-            AWSXRay.endSegment();
-        }
+//        Segment segment = AWSXRay.beginSegment("MyApplication");
+//        segment.setOrigin(httpServletRequest.getRequestURI());
+//        segment.setUser("Rohit");
+//        Map<String, Object> httpMap = new HashMap<>();
+//
+//        try {
+//            Request request = new Request.Builder()
+//                    .url(url)
+//                    .get()
+//                    .build();
+//
+//            httpMap.put("request", Map.of(
+//                    "method", "GET",
+//                    "url", url
+//            ));
+//
+//
+//            Response response = client.newCall(request).execute();
+//
+//            httpMap.put("response", Map.of(
+//                    "status", response.code()
+//            ));
+//
+//            return response.body().string();
+//        } catch (Exception e) {
+//            segment.setError(true);
+//            httpMap.put("response", Map.of(
+//                    "status", 500
+//            ));
+//            segment.putMetadata("error", e.getMessage());
+//            throw e;
+//        } finally {
+//            segment.setHttp(httpMap);
+//            AWSXRay.endSegment();
+//        }
     }
 }
