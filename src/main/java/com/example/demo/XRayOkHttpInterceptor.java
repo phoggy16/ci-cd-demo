@@ -14,15 +14,15 @@ public class XRayOkHttpInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
 
-        Segment segment = AWSXRay.beginSegment("MyApplication-DEV");
-//        Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: " + request.url());
+//        Segment segment = AWSXRay.beginSegment("MyApplication-DEV");
+        Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: " + request.url());
 
         Map<String, Object> httpMap = new HashMap<>();
 
         try {
 
-            segment.setOrigin(request.method());
-            segment.setUser("Rohit");
+//            subsegment.setOrigin(request.method());
+//            segment.setUser("Rohit");
 
             httpMap.put("request", Map.of(
             "method", "GET",
@@ -44,16 +44,16 @@ public class XRayOkHttpInterceptor implements Interceptor {
 
             return response;
         } catch (Exception e) {
-            segment.setError(true);
-            segment.addException(e);
-            segment.putMetadata("error", e.getMessage());
+            subsegment.setError(true);
+            subsegment.addException(e);
+            subsegment.putMetadata("error", e.getMessage());
             httpMap.put("response", Map.of(
                     "status", 500
             ));
             throw e;
         } finally {
-            segment.setHttp(httpMap);
-//            AWSXRay.endSubsegment();
+            subsegment.setHttp(httpMap);
+            AWSXRay.endSubsegment();
 //            AWSXRay.endSegment();
         }
     }
