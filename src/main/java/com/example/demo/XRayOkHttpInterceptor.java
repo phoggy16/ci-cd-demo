@@ -54,7 +54,7 @@ public class XRayOkHttpInterceptor implements Interceptor {
         } finally {
             segment.setHttp(httpMap);
 //            AWSXRay.endSubsegment();
-            AWSXRay.endSegment();
+//            AWSXRay.endSegment();
         }
     }
 }
