@@ -8,13 +8,14 @@ import okhttp3.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class XRayOkHttpInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
 
-//        Segment segment = AWSXRay.beginSegment("MyApplication-DEV");
+        Optional<Segment> segment = AWSXRay.getCurrentSegmentOptional();
         Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: " + request.url());
 
         Map<String, Object> httpMap = new HashMap<>();
@@ -35,6 +36,10 @@ public class XRayOkHttpInterceptor implements Interceptor {
                     "status", response.code()
             ));
 
+            segment.get().putHttp("response",Map.of(
+                    "status", response.code()
+            ));
+
             // Add metadata to the trace
 //            subsegment.putAnnotation("method", request.method());
 //            subsegment.putAnnotation("url", request.url().toString());
@@ -52,6 +57,7 @@ public class XRayOkHttpInterceptor implements Interceptor {
             ));
             throw e;
         } finally {
+
             subsegment.setHttp(httpMap);
             AWSXRay.endSubsegment();
 //            AWSXRay.endSegment();
