@@ -15,7 +15,7 @@ public class XRayOkHttpInterceptor implements Interceptor {
         Request request = chain.request();
 
         Segment segment = AWSXRay.beginSegment("MyApplication-DEV");
-        Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: " + request.url());
+//        Subsegment subsegment = AWSXRay.beginSubsegment("OkHttp Call: " + request.url());
 
         Map<String, Object> httpMap = new HashMap<>();
 
@@ -36,25 +36,25 @@ public class XRayOkHttpInterceptor implements Interceptor {
             ));
 
             // Add metadata to the trace
-            subsegment.putAnnotation("method", request.method());
-            subsegment.putAnnotation("url", request.url().toString());
-            subsegment.putMetadata("response_code", response.code());
-            subsegment.putMetadata("request", request);
-            subsegment.putMetadata("response", response);
+//            subsegment.putAnnotation("method", request.method());
+//            subsegment.putAnnotation("url", request.url().toString());
+//            subsegment.putMetadata("response_code", response.code());
+//            subsegment.putMetadata("request", request);
+//            subsegment.putMetadata("response", response);
 
             return response;
         } catch (Exception e) {
-            subsegment.setError(true);
-            subsegment.addException(e);
-            subsegment.putMetadata("error", e.getMessage());
+            segment.setError(true);
+            segment.addException(e);
+            segment.putMetadata("error", e.getMessage());
             httpMap.put("response", Map.of(
                     "status", 500
             ));
             throw e;
         } finally {
-            subsegment.setHttp(httpMap);
-            AWSXRay.endSubsegment();
-//            AWSXRay.endSegment();
+            segment.setHttp(httpMap);
+//            AWSXRay.endSubsegment();
+            AWSXRay.endSegment();
         }
     }
 }
