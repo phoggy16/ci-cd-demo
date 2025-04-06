@@ -36,9 +36,11 @@ public class XRayOkHttpInterceptor implements Interceptor {
                     "status", response.code()
             ));
 
-            segment.get().putHttp("response",Map.of(
+            Map<String, Object> httpMapSegment = new HashMap<>();
+            httpMap.put("response", Map.of(
                     "status", response.code()
             ));
+            segment.get().setHttp(httpMapSegment);
 
             // Add metadata to the trace
 //            subsegment.putAnnotation("method", request.method());
